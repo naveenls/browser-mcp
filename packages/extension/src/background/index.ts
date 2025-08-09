@@ -1,0 +1,1 @@
+console.log('Browser MCP Extension: Background service worker loaded');

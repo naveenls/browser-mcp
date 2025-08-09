@@ -1,0 +1,19 @@
+{
+  "name": "@browser-mcp/extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for browser MCP integration",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["chrome-extension", "mcp", "browser"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/chrome": "^0.0.258"
+  }
+}
