@@ -31,18 +31,12 @@ export interface BaseMessage {
  */
 export interface ConnectMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.CONNECT;
-  payload: {
-    sessionId: string;
-    tabId?: number;
-  };
+  payload: { sessionId: string };
 }
 
 export interface DisconnectMessage extends BaseMessage {
   type: typeof MESSAGE_TYPES.DISCONNECT;
-  payload: {
-    sessionId: string;
-    tabId?: number;
-  };
+  payload: { sessionId: string };
 }
 
 export interface ConnectionAckMessage extends BaseMessage {

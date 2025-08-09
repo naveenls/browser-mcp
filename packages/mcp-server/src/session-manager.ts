@@ -10,17 +10,12 @@ interface SessionInfo {
   port: number;
 }
 
-interface TabConnection {
-  tabId: number;
-  ws: WebSocket;
-}
-
 export class SessionManager {
   private sessionId: string;
   private sessionName: string;
   private sessionPort: number | undefined;
   private httpServer: Server | undefined;
-  private connection: TabConnection | undefined;
+  private connection: WebSocket | undefined;
 
   constructor() {
     this.sessionId = randomUUID();
@@ -32,7 +27,7 @@ export class SessionManager {
   async close() {
     // Close the WebSocket connection with the tab
     if (this.connection) {
-      this.connection.ws.close();
+      this.connection.close();
     }
     this.sessionPort = undefined;
     this.httpServer?.close();
@@ -144,23 +139,15 @@ export class SessionManager {
   }
 
   private handleConnect(ws: WebSocket, message: shared.ConnectMessage) {
-    const { sessionId, tabId } = message.payload;    
+    const { sessionId } = message.payload;    
     if (sessionId !== this.sessionId) {
       this.sendError(ws, 'Invalid session ID', message.id);
       return;
     }
 
-    if (!tabId) {
-      this.sendError(ws, 'Tab ID is required for connection', message.id);
-      return;
-    }
-
     // Store the connection
-    this.connection = {
-      tabId,
-      ws,
-    };
-    console.info(`Tab ${tabId} connected to session ${this.sessionName}`);
+    this.connection = ws;
+    console.info(`Session ${this.sessionName} connected`);
     
     // Send confirmation
     const ackMessage: shared.ConnectionAckMessage = {
@@ -175,21 +162,20 @@ export class SessionManager {
   }
 
   private handleDisconnect(message: shared.DisconnectMessage) {
-    const { sessionId, tabId } = message.payload;
+    const { sessionId } = message.payload;
     
-    if (sessionId !== this.sessionId || tabId !== this.connection?.tabId) {
+    if (sessionId !== this.sessionId) {
       return;
     }
 
     this.connection = undefined;
-    console.info(`Tab ${tabId} disconnected from session`);
+    console.info(`Session ${this.sessionName} disconnected`);
   }
 
   private sendError(ws: WebSocket, error: string, messageId: string) {
     const errorMessage: shared.ErrorMessage = {
       type: shared.MESSAGE_TYPES.ERROR,
       id: messageId,
-      timestamp: Date.now(),
       payload: {
         error,
       }
